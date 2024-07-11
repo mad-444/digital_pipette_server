@@ -1,6 +1,6 @@
 
-
 import pigpio
+import json
 
 class DigitalPipette():
     def __init__(self, name, gpio_pin, us_per_uL, zero_position, limit_position, capacity):
@@ -18,27 +18,36 @@ class DigitalPipette():
         
         self.remaining_volume = None
 
+        self.syringe_loaded = False
+
+    def from_config(cls, fp):
+        with open(fp) as f:
+            kwargs = json.load(f)
+
+        return cls(**kwargs)
+
 
     def load_syringe(self, volume, pulsewidth):
 
         self.remaining_volume = volume
         self.current_pulsewidth = pulsewidth
 
+        self.syringe_loaded = True
 
-
-
-
+        return
 
     def dispense(self, volume: float):
         """
         Dispenses desired volume
         """
 
+        assert self.syringe_loaded, 'Syringe not loaded'
+
         assert volume < self.remaining_volume, f'Pipette {self.name} has {self.remaining_volume} uL remaining, but dispense requested {volume} uL'
 
         new_pulsewidth = self.get_pulsewidth(volume, mode = 'dispense')
 
-        pigpio.set_servo_pulsewidth(self.gpio_pin, new_pulsewidth)
+        self.set_pulsewidth(new_pulsewidth)
 
         self.current_pulsewidth = new_pulsewidth
         self.remaining_volume = self.remaining_volume - volume
@@ -49,12 +58,12 @@ class DigitalPipette():
         """
         Aspirates desired volume into syringe for loading
         """
-
+        assert self.syringe_loaded, 'Syringe must be loaded '
         assert self.remaining_volume + volume < self.capacity, f'Pipette {self.name} has {self.capacity - self.remaining_volume} uL of available capacity by aspirate requested {volume} uL'
 
         new_pulsewidth = self.get_pulsewidth(volume, mode = 'aspirate')
 
-        pigpio.set_servo_pulsewidth(self.gpio_pin, new_pulsewidth)
+        self.set_pulsewidth(new_pulsewidth)
 
         self.current_pulsewidth = new_pulsewidth
         self.remaining_volume = self.remaining_volume + volume
@@ -73,6 +82,10 @@ class DigitalPipette():
             new_pulsewidth = self.current_pulsewidth - delta_pulsewidth
 
         return new_pulsewidth
+    
+    def set_pulsewidth(self, pulsewidth):
+        self.pi.set_servo_pulsewidth(self.gpio_pin, pulsewidth)
+        return
 
 
 
