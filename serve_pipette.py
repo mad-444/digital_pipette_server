@@ -16,7 +16,7 @@ def load_syringe():
 
     pipette.load_syringe(volume, pulsewidth)
 
-    return
+    return 'loaded_syringe'
 
 
 @app.route('/dispense', methods = ['POST'])
@@ -29,7 +29,7 @@ def dispense():
 
     pipette.dispense(volume)
 
-    return
+    return 'dispensed'
 
 
 @app.route('/aspirate', methods = ['POST'])
@@ -41,7 +41,7 @@ def aspirate():
 
     pipette.aspirate(volume)
 
-    return
+    return 'aspirated'
 
 
 @app.route('/set_pulsewidth', methods = ['POST'])
@@ -49,7 +49,9 @@ def set_pulsewidth():
     data = request.json
     pulsewidth = data['pulsewidth']
 
-    assert ((pulsewidth < 2000) and (pulsewidth > 1000)), 'Pulsewidth must be between 1000 and 2000'
+    assert ((pulsewidth < pipette.limit_position) and (pulsewidth > pipette.zero_position)), 'Pulsewidth must be between 1000 and 2000'
 
     pipette.set_pulsewidth(pulsewidth)
            
+
+    return 'set_pulsewidth'

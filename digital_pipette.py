@@ -19,7 +19,9 @@ class DigitalPipette():
         self.remaining_volume = None
 
         self.syringe_loaded = False
+   
 
+    @classmethod
     def from_config(cls, fp):
         with open(fp) as f:
             kwargs = json.load(f)
