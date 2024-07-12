@@ -17,6 +17,13 @@ def get_config():
 
     return jsonify(config)
 
+@app.route('/get_status', methods = ['GET'])
+def get_status():
+    status = {}
+    status['remaining_volume'] = pipette.remaining_volume
+    status['syringe_loaded'] = pipette.syringe_loaded
+
+
 @app.route('/load_syringe', methods = ['POST'])
 def load_syringe():
     data = request.json
