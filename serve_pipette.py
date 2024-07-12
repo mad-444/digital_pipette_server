@@ -7,6 +7,16 @@ import digital_pipette
 
 pipette = digital_pipette.DigitalPipette.from_config('10_cc_config.json')
 
+@app.route('/get_config', methods = ['GET'])
+def get_config():
+    config = {}
+    config['capacity'] = pipette.capacity
+    config['name'] = pipette.name
+    config['full_position'] = pipette.full_position
+    config['empty_position'] = pipette.empty_position
+
+    return jsonify(config)
+
 @app.route('/load_syringe', methods = ['POST'])
 def load_syringe():
     data = request.json
@@ -49,7 +59,7 @@ def set_pulsewidth():
     data = request.json
     pulsewidth = data['pulsewidth']
 
-    assert ((pulsewidth < pipette.limit_position) and (pulsewidth > pipette.zero_position)), 'Pulsewidth must be between 1000 and 2000'
+    assert ((pulsewidth < pipette.empty_position) and (pulsewidth > pipette.full_position)), 'Pulsewidth must be between 1000 and 2000'
 
     pipette.set_pulsewidth(pulsewidth)
            

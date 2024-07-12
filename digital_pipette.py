@@ -3,13 +3,13 @@ import pigpio
 import json
 
 class DigitalPipette():
-    def __init__(self, name, gpio_pin, us_per_uL, zero_position, limit_position, capacity):
+    def __init__(self, name, gpio_pin, us_per_uL, full_position, empty_position, capacity):
 
         self.gpio_pin = gpio_pin
         self.name = name
         self.us_per_uL = us_per_uL
-        self.zero_position = zero_position
-        self.limit_position = limit_position
+        self.full_position = full_position
+        self.empty_position = empty_position
         self.capacity = capacity
 
         self.pi = pigpio.pi()
