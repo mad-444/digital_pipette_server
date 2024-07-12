@@ -23,6 +23,7 @@ def get_status():
     status['remaining_volume'] = pipette.remaining_volume
     status['syringe_loaded'] = pipette.syringe_loaded
 
+    return jsonify(status)
 
 @app.route('/load_syringe', methods = ['POST'])
 def load_syringe():
