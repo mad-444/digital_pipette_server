@@ -1,0 +1,8 @@
+{
+  "us_per_uL": 0.613,
+  "gpio_pin": 24,
+  "name": "10cc_syringe",
+  "full_position": 1217,
+  "empty_position": 1830,
+  "capacity": 1000
+}

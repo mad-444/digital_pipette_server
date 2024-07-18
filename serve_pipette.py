@@ -5,10 +5,18 @@ app = Flask(__name__)
 
 import digital_pipette
 
-pipette = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/10_cc_config.json')
+pipette_10cc = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/10_cc_config.json')
+pipette_1cc = digital_pipette.DigitalPipette.from_config('home/bgpelkie/digital_pipette_server/1_cc_config.json')
 
-@app.route('/get_config', methods = ['GET'])
+pipettes = {'10cc':pipette_10cc, '1cc':pipette_1cc}
+
+@app.route('/get_config', methods = ['POST'])
 def get_config():
+
+    data = request.json
+    name = data['name']
+    pipette = pipettes[name]
+
     config = {}
     config['capacity'] = pipette.capacity
     config['name'] = pipette.name
@@ -17,8 +25,13 @@ def get_config():
 
     return jsonify(config)
 
-@app.route('/get_status', methods = ['GET'])
+@app.route('/get_status', methods = ['POST'])
 def get_status():
+
+    data = request.json
+    name = data['name']
+    pipette = pipettes[name]
+
     status = {}
     status['remaining_volume'] = pipette.remaining_volume
     status['syringe_loaded'] = pipette.syringe_loaded
@@ -28,6 +41,8 @@ def get_status():
 @app.route('/load_syringe', methods = ['POST'])
 def load_syringe():
     data = request.json
+    name = data['name']
+    pipette = pipettes[name]
 
     volume = data['volume']
     pulsewidth = data['pulsewidth']
@@ -40,6 +55,8 @@ def load_syringe():
 @app.route('/dispense', methods = ['POST'])
 def dispense():
     data = request.json
+    name = data['name']
+    pipette = pipettes[name]
 
     volume = data['volume']
 
@@ -54,6 +71,8 @@ def dispense():
 def aspirate():
     data = request.json
     volume = data['volume']
+    name = data['name']
+    pipette = pipettes[name]
 
     assert volume + pipette.remaining_volume < pipette.capacity
 
@@ -66,6 +85,8 @@ def aspirate():
 def set_pulsewidth():
     data = request.json
     pulsewidth = data['pulsewidth']
+    name = data['name']
+    pipette = pipettes[name]
 
     assert ((pulsewidth < pipette.empty_position) and (pulsewidth > pipette.full_position)), 'Pulsewidth must be between 1000 and 2000'
 
