@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 import digital_pipette
 
-pipette = digital_pipette.DigitalPipette.from_config('10_cc_config.json')
+pipette = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/10_cc_config.json')
 
 @app.route('/get_config', methods = ['GET'])
 def get_config():
