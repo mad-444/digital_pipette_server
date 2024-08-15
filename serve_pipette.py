@@ -5,10 +5,12 @@ app = Flask(__name__)
 
 import digital_pipette
 
-pipette_10cc = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/10_cc_config.json')
-pipette_1cc = digital_pipette.DigitalPipette.from_config('home/bgpelkie/digital_pipette_server/1_cc_config.json')
+pipette_10cc_1 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/10_cc_1_config.json')
+pipette_1cc_1 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_1_config.json')
+pipette_1cc_2 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_2_config.json')
+pipette_1cc_3 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_3_config.json')
 
-pipettes = {'10cc':pipette_10cc, '1cc':pipette_1cc}
+pipettes = {'10cc_1':pipette_10cc_1, '1cc_1':pipette_1cc_1, '1cc_2':pipette_1cc_2, '1cc_3':pipette_1cc_3}
 
 @app.route('/get_config', methods = ['POST'])
 def get_config():

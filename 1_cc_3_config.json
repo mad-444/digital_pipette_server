@@ -1,0 +1,8 @@
+{
+  "us_per_uL": 0.6228,
+  "gpio_pin": 17,
+  "name": "1cc_3",
+  "full_position": 1240,
+  "empty_position": 1845,
+  "capacity": 1000
+}
