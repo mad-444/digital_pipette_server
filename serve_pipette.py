@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 logger = logging.getLogger(__name__)
 
-logger.basicConfig(filename = 'digital_syringe_logs.log', level = logging.debug)
+logging.basicConfig(filename = 'digital_syringe_logs.log', level = logging.DEBUG)
 
 import digital_pipette
 
@@ -28,7 +28,7 @@ pipettes = {'10cc_1':pipette_10cc_1, '1cc_1':pipette_1cc_1, '1cc_2':pipette_1cc_
 
 i2c = board.I2C()
 ds3502 = adafruit_ds3502.DS3502(i2c)
-
+ds3502.wiper = 127
 
 @app.route('/get_config', methods = ['POST'])
 def get_config():
@@ -131,6 +131,7 @@ def set_pulsewidth():
     assert ((pulsewidth < pipette.empty_position) and (pulsewidth > pipette.full_position)), 'Pulsewidth must be between 1000 and 2000'
     assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
 
+    logging.debug(f'Setting potentiometer wiper to {wiper_val}')
     ds3502.wiper = wiper_val
     pipette.set_pulsewidth(pulsewidth)
            
