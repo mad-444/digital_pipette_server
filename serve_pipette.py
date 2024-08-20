@@ -1,8 +1,6 @@
 from flask import Flask, request, Response
 from flask.json import jsonify
 import logging
-import board
-import adafruit_ds3502
 
 
 app = Flask(__name__)
@@ -26,9 +24,6 @@ logger.info('Instantiated pipette 1cc_3')
 
 pipettes = {'10cc_1':pipette_10cc_1, '1cc_1':pipette_1cc_1, '1cc_2':pipette_1cc_2, '1cc_3':pipette_1cc_3}
 
-i2c = board.I2C()
-ds3502 = adafruit_ds3502.DS3502(i2c)
-ds3502.wiper = 127
 
 @app.route('/get_config', methods = ['POST'])
 def get_config():
@@ -84,14 +79,11 @@ def dispense():
     data = request.json
     name = data['name']
     pipette = pipettes[name]
-    wiper_val = data['wiper']
 
     volume = data['volume']
 
     assert volume < pipette.remaining_volume, 'Volume greater than remaining volume'
     assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
-
-    ds3502.wiper = wiper_val
 
     pipette.dispense(volume)
 
@@ -106,12 +98,10 @@ def aspirate():
     volume = data['volume']
     name = data['name']
     pipette = pipettes[name]
-    wiper_val = data['wiper']
 
     assert volume + pipette.remaining_volume < pipette.capacity
     assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
 
-    ds3502.wiper = wiper_val
 
     pipette.aspirate(volume)
 
@@ -126,13 +116,11 @@ def set_pulsewidth():
     pulsewidth = data['pulsewidth']
     name = data['name']
     pipette = pipettes[name]
-    wiper_val = data['wiper']
 
     assert ((pulsewidth < pipette.empty_position) and (pulsewidth > pipette.full_position)), 'Pulsewidth must be between 1000 and 2000'
     assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
 
     logging.debug(f'Setting potentiometer wiper to {wiper_val}')
-    ds3502.wiper = wiper_val
     pipette.set_pulsewidth(pulsewidth)
            
     logging.info(f'Syringe {name} pulsewidth set to {pulsewidth}')
