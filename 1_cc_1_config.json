@@ -4,5 +4,7 @@
   "name": "1cc_1",
   "full_position": 1240,
   "empty_position": 2000,
-  "capacity": 1000
+  "capacity": 1000,
+  "time_step_size":0.1,
+  "min_pw_step":3
 }

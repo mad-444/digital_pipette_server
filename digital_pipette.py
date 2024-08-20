@@ -1,8 +1,8 @@
-
 import pigpio
 import json
 import numpy as np
 import time
+import warnings
 
 import logging
 
@@ -47,9 +47,14 @@ class DigitalPipette():
 
         return
 
-    def dispense(self, volume: float):
+    def dispense(self, volume: float, s: int = 100):
         """
         Dispenses desired volume
+
+        :param volume: volume of liquid to dispense in uL
+        :type volume: float
+        :param s: speed to dispense at. speed compliance is best effort within constraints of physical system
+        :type s: int
         """
 
         assert self.syringe_loaded, 'Syringe not loaded'
@@ -58,18 +63,21 @@ class DigitalPipette():
 
         new_pulsewidth = self.get_pulsewidth(volume, mode = 'dispense')
 
-        self.set_pulsewidth(new_pulsewidth)
+        self.set_pulsewidth_speed(new_pulsewidth, s = s)
 
         self.current_pulsewidth = new_pulsewidth
         self.remaining_volume = self.remaining_volume - volume
 
         return
     
-    def aspirate(self, volume: float, s = 1):
+    def aspirate(self, volume: float, s: int = 100):
         """
         Aspirates desired volume into syringe for loading
-        
-        s - uL/s
+
+        :param volume: Volume of liquid to aspirate in uL
+        :type volume: float
+        :param s: Speed of aspiration in uL/s. Speed compliance is best effort within the physical constraints of the system
+        :type s: int
         """
         assert self.syringe_loaded, 'Syringe must be loaded '
         assert self.remaining_volume + volume < self.capacity, f'Pipette {self.name} has {self.capacity - self.remaining_volume} uL of available capacity by aspirate requested {volume} uL'
@@ -77,20 +85,7 @@ class DigitalPipette():
         new_pulsewidth = self.get_pulsewidth(volume, mode = 'aspirate')
 
 
-        # implement speed control by breaking movement into small steps, controlling steps
-        delta_pulsewidth = new_pulsewidth - self.current_pulsewidth
-        movement_time = delta_pulsewidth/(s*self.us_per_uL)
-
-        n_steps = np.floor(movement_time/step_resolution)
-        pulsewidth_step = np.floor(delta_pulsewidth/n_steps)
-
-        for i in range(n_steps):
-            move_to_pw = self.current_pulsewidth+pulsewidth_step
-            self.set_pulsewidth(move_to_pw)
-            self.current_pulsewidth = move_to_pw
-            time.sleep(self.step_resolution)
-
-        self.set_pulsewidth(new_pulsewidth)
+        self.set_pulsewidth_speed(volume, s = s)
 
         self.current_pulsewidth = new_pulsewidth
         self.remaining_volume = self.remaining_volume + volume
@@ -116,38 +111,51 @@ class DigitalPipette():
         return
 
     def set_pulsewidth_speed(self, pulsewidth, s = 100):
-        print('current pulsewidth: ', self.current_pulsewidth)
-        delta_pulsewidth = pulsewidth - self.current_pulsewidth
-
-        print('pulswidth total change: ', delta_pulsewidth)
-
-        if delta_pulsewidth < 0:
-            sign = -1
-        else:
-            sign = 1
-        step_size = s * self.us_per_uL * self.time_step_size
-
-        if step_size < self.min_pw_step:
-            print(f'warning: required step size is below minimum step size. Actual speed will be {self.min_pw_step/(self.us_per_uL*self.time_step_size)}')
-            step_size = self.min_pw_step
-
-        n_steps = abs(int(np.floor(delta_pulsewidth/step_size))) - 1
-        print('n_steps: ', n_steps)
-
-
-        print('step size [uS]: ', step_size)
+        """
+        Set servo signal pulsewidth to a new value with speed control
+        Speed control is implemented in software by moving the servo in small sub-steps on a timer to approximate a slower move. 
+        """
+        step_size, sign, n_steps = _calculate_stepped_move(pulsewidth, s)
 
         for i in range(n_steps):
             move_to_pw = self.current_pulsewidth+(step_size*sign)
-            print('moving to pw ', move_to_pw)
             self.set_pulsewidth(move_to_pw)
             self.current_pulsewidth = move_to_pw
             time.sleep(self.time_step_size)
         
         # set final pulsewidth to make sure we get there 
         self.set_pulsewidth(pulsewidth)
-
         self.current_pulsewidth = pulsewidth
+
+    def _calculate_stepped_move(self, pulsewidth, s):
+        """
+        Calculate step size and n_steps parameters for a stepped speed-controlled move
+        """
+        delta_pulsewidth = pulsewidth - self.current_pulsewidth
+
+        logging.debug('pulswidth total change: ', delta_pulsewidth)
+
+        # account for direction of move 
+        if delta_pulsewidth < 0:
+            sign = -1
+        else:
+            sign = 1
+        
+        # calculate step size (servo signal step change) from speed in uL/s, conversion factor, and time step
+        step_size = s * self.us_per_uL * self.time_step_size
+
+        if step_size < self.min_pw_step:
+            warnings.warn(f'Required step size is below minimum step size. Actual speed will be {self.min_pw_step/(self.us_per_uL*self.time_step_size)}')
+            step_size = self.min_pw_step
+
+        logging.degub('PW step size: [uS]: ', step_size)
+
+        n_steps = abs(int(np.floor(delta_pulsewidth/step_size))) - 1
+        logging.debug('n_steps: ', n_steps)
+
+
+        return step_size, sign, n_steps
+
 
 
 
