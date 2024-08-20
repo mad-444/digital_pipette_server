@@ -1,6 +1,8 @@
 
 import pigpio
 import json
+import numpy as np
+import time
 
 import logging
 
@@ -15,7 +17,7 @@ class DigitalPipette():
         self.full_position = full_position
         self.empty_position = empty_position
         self.capacity = capacity
-
+        self.step_resolution = 0.1
         self.pi = pigpio.pi()
 
         self.current_pulsewidth = 0
@@ -62,14 +64,30 @@ class DigitalPipette():
 
         return
     
-    def aspirate(self, volume: float):
+    def aspirate(self, volume: float, s = 1):
         """
         Aspirates desired volume into syringe for loading
+        
+        s - uL/s
         """
         assert self.syringe_loaded, 'Syringe must be loaded '
         assert self.remaining_volume + volume < self.capacity, f'Pipette {self.name} has {self.capacity - self.remaining_volume} uL of available capacity by aspirate requested {volume} uL'
 
         new_pulsewidth = self.get_pulsewidth(volume, mode = 'aspirate')
+
+
+        # implement speed control by breaking movement into small steps, controlling steps
+        delta_pulsewidth = new_pulsewidth - self.current_pulsewidth
+        movement_time = delta_pulsewidth/(s*self.us_per_uL)
+
+        n_steps = np.floor(movement_time/step_resolution)
+        pulsewidth_step = np.floor(delta_pulsewidth/n_steps)
+
+        for i in range(n_steps):
+            move_to_pw = self.current_pulsewidth+pulsewidth_step
+            self.set_pulsewidth(move_to_pw)
+            self.current_pulsewidth = move_to_pw
+            time.sleep(self.step_resolution)
 
         self.set_pulsewidth(new_pulsewidth)
 
@@ -94,6 +112,24 @@ class DigitalPipette():
     def set_pulsewidth(self, pulsewidth):
         self.pi.set_servo_pulsewidth(self.gpio_pin, pulsewidth)
         return
+
+    def set_pulsewidth_speed(self, pulsewidth, s = 1):
+        delta_pulsewidth = new_pulsewidth - self.current_pulsewidth
+        movement_time = delta_pulsewidth/(s*self.us_per_uL)
+
+        n_steps = np.floor(movement_time/step_resolution)
+        pulsewidth_step = np.floor(delta_pulsewidth/n_steps)
+
+        for i in range(n_steps):
+            move_to_pw = self.current_pulsewidth+pulsewidth_step
+            self.set_pulsewidth(move_to_pw)
+            self.current_pulsewidth = move_to_pw
+            time.sleep(self.step_resolution)
+
+        self.set_pulsewidth(new_pulsewidth)
+
+        self.current_pulsewidth = new_pulsewidth
+
 
 
 
