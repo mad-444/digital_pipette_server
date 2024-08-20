@@ -4,6 +4,10 @@ import json
 import numpy as np
 import time
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class DigitalPipette():
     def __init__(self, name, gpio_pin, us_per_uL, full_position, empty_position, capacity):
 
@@ -21,6 +25,8 @@ class DigitalPipette():
         self.remaining_volume = None
 
         self.syringe_loaded = False
+
+        logging.debug(f'Initialized syringe {name} on gpio pin {gpio_pin}')
    
 
     @classmethod

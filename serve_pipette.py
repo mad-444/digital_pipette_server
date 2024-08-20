@@ -1,16 +1,34 @@
 from flask import Flask, request, Response
 from flask.json import jsonify
+import logging
+import board
+import adafruit_ds3502
+
 
 app = Flask(__name__)
 
+logger = logging.getLogger(__name__)
+
+logger.basicConfig(filename = 'digital_syringe_logs.log', level = logging.debug)
+
 import digital_pipette
 
+logger.info('Initializing digital pipette flask app')
+
 pipette_10cc_1 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/10_cc_1_config.json')
+logger.info('Instantiated pipette_10cc_1')
 pipette_1cc_1 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_1_config.json')
+logger.info('Instantiated pipette 1cc_1')
 pipette_1cc_2 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_2_config.json')
+logger.info('Instantiated pipette 1cc_2')
 pipette_1cc_3 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_3_config.json')
+logger.info('Instantiated pipette 1cc_3')
 
 pipettes = {'10cc_1':pipette_10cc_1, '1cc_1':pipette_1cc_1, '1cc_2':pipette_1cc_2, '1cc_3':pipette_1cc_3}
+
+i2c = board.I2C()
+ds3502 = adafruit_ds3502.DS3502(i2c)
+
 
 @app.route('/get_config', methods = ['POST'])
 def get_config():
@@ -25,6 +43,8 @@ def get_config():
     config['full_position'] = pipette.full_position
     config['empty_position'] = pipette.empty_position
 
+    logger.info(f'Served syringe config for {name}')
+
     return jsonify(config)
 
 @app.route('/get_status', methods = ['POST'])
@@ -34,9 +54,12 @@ def get_status():
     name = data['name']
     pipette = pipettes[name]
 
+
     status = {}
     status['remaining_volume'] = pipette.remaining_volume
     status['syringe_loaded'] = pipette.syringe_loaded
+
+    logger.info(f'Served syringe status for {name}')
 
     return jsonify(status)
 
@@ -51,6 +74,8 @@ def load_syringe():
 
     pipette.load_syringe(volume, pulsewidth)
 
+    logger.info(f'Loaded syringe {name} with volume {volume} uL and pulsewidth position {pulsewidth} us')
+
     return 'loaded_syringe'
 
 
@@ -59,12 +84,18 @@ def dispense():
     data = request.json
     name = data['name']
     pipette = pipettes[name]
+    wiper_val = data['wiper']
 
     volume = data['volume']
 
     assert volume < pipette.remaining_volume, 'Volume greater than remaining volume'
+    assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
+
+    ds3502.wiper = wiper_val
 
     pipette.dispense(volume)
+
+    logger.info(f'Syringe {name} dispensed {volume} uL')
 
     return 'dispensed'
 
@@ -75,10 +106,16 @@ def aspirate():
     volume = data['volume']
     name = data['name']
     pipette = pipettes[name]
+    wiper_val = data['wiper']
 
     assert volume + pipette.remaining_volume < pipette.capacity
+    assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
+
+    ds3502.wiper = wiper_val
 
     pipette.aspirate(volume)
+
+    logging.info(f'Syringe {name} aspirated {volume} uL')
 
     return 'aspirated'
 
@@ -89,11 +126,15 @@ def set_pulsewidth():
     pulsewidth = data['pulsewidth']
     name = data['name']
     pipette = pipettes[name]
+    wiper_val = data['wiper']
 
     assert ((pulsewidth < pipette.empty_position) and (pulsewidth > pipette.full_position)), 'Pulsewidth must be between 1000 and 2000'
+    assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
 
+    ds3502.wiper = wiper_val
     pipette.set_pulsewidth(pulsewidth)
            
+    logging.info(f'Syringe {name} pulsewidth set to {pulsewidth}')
 
     return 'set_pulsewidth'
 
