@@ -115,10 +115,11 @@ class DigitalPipette():
         Set servo signal pulsewidth to a new value with speed control
         Speed control is implemented in software by moving the servo in small sub-steps on a timer to approximate a slower move. 
         """
-        step_size, sign, n_steps = _calculate_stepped_move(pulsewidth, s)
+        step_size, sign, n_steps = self._calculate_stepped_move(pulsewidth, s)
 
         for i in range(n_steps):
             move_to_pw = self.current_pulsewidth+(step_size*sign)
+            #print('moving to pulsewidth ', move_to_pw)
             self.set_pulsewidth(move_to_pw)
             self.current_pulsewidth = move_to_pw
             time.sleep(self.time_step_size)
@@ -131,9 +132,10 @@ class DigitalPipette():
         """
         Calculate step size and n_steps parameters for a stepped speed-controlled move
         """
+        #print(f'calculating steps for pulsewidth {pulsewidth} and speed {s}')
         delta_pulsewidth = pulsewidth - self.current_pulsewidth
-
-        logging.debug('pulswidth total change: ', delta_pulsewidth)
+        #print('delta: ', delta_pulsewidth)
+        logging.debug(f'pulsewidth total change: {delta_pulsewidth}')
 
         # account for direction of move 
         if delta_pulsewidth < 0:
@@ -143,16 +145,19 @@ class DigitalPipette():
         
         # calculate step size (servo signal step change) from speed in uL/s, conversion factor, and time step
         step_size = s * self.us_per_uL * self.time_step_size
-
+        
+        #print('calculated step size is ', step_size, ' uS')
         if step_size < self.min_pw_step:
             warnings.warn(f'Required step size is below minimum step size. Actual speed will be {self.min_pw_step/(self.us_per_uL*self.time_step_size)}')
             step_size = self.min_pw_step
 
-        logging.degub('PW step size: [uS]: ', step_size)
+        #print('corrected/actual step size is ', step_size)
+
+        logging.debug(f'PW step size: [uS]: {step_size}')
 
         n_steps = abs(int(np.floor(delta_pulsewidth/step_size))) - 1
-        logging.debug('n_steps: ', n_steps)
-
+        logging.debug(f'n_steps: {n_steps}')
+        #print('number of steps is ', n_steps)
 
         return step_size, sign, n_steps
 

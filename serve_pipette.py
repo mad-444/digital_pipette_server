@@ -83,7 +83,6 @@ def dispense():
     s = data['speed']
 
     assert volume < pipette.remaining_volume, 'Volume greater than remaining volume'
-    assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
 
     pipette.dispense(volume, s = s)
 
@@ -101,7 +100,6 @@ def aspirate():
     s = data['speed']
 
     assert volume + pipette.remaining_volume < pipette.capacity
-    assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
 
 
     pipette.aspirate(volume, s = s)
@@ -117,12 +115,10 @@ def set_pulsewidth():
     pulsewidth = data['pulsewidth']
     name = data['name']
     pipette = pipettes[name]
-    s = data['s']
+    s = data['speed']
 
     assert ((pulsewidth < pipette.empty_position) and (pulsewidth > pipette.full_position)), 'Pulsewidth must be between 1000 and 2000'
-    assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
 
-    logging.debug(f'Setting potentiometer wiper to {wiper_val}')
     pipette.set_pulsewidth_speed(pulsewidth, s)
            
     logging.info(f'Syringe {name} pulsewidth set to {pulsewidth}')
