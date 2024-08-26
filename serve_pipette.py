@@ -82,7 +82,7 @@ def dispense():
     volume = data['volume']
     s = data['speed']
 
-    assert volume < pipette.remaining_volume, 'Volume greater than remaining volume'
+    assert volume <= pipette.remaining_volume, f'Volume {volume} uL is greater than remaining volume ({pipette.remaining_volume} uL)'
 
     pipette.dispense(volume, s = s)
 
@@ -99,7 +99,7 @@ def aspirate():
     pipette = pipettes[name]
     s = data['speed']
 
-    assert volume + pipette.remaining_volume < pipette.capacity
+    assert volume + pipette.remaining_volume <= pipette.capacity, f'Volume {volume} is greater than remaining pipette capacity ({pipette.capacity})'
 
 
     pipette.aspirate(volume, s = s)

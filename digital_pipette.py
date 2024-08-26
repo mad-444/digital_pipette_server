@@ -59,10 +59,11 @@ class DigitalPipette():
 
         assert self.syringe_loaded, 'Syringe not loaded'
 
-        assert volume < self.remaining_volume, f'Pipette {self.name} has {self.remaining_volume} uL remaining, but dispense requested {volume} uL'
+        assert volume <= self.remaining_volume, f'Pipette {self.name} has {self.remaining_volume} uL remaining, but dispense requested {volume} uL'
 
         new_pulsewidth = self.get_pulsewidth(volume, mode = 'dispense')
 
+        logging.debug(f'New pulsewidth for dispense: {new_pulsewidth}')
         self.set_pulsewidth_speed(new_pulsewidth, s = s)
 
         self.current_pulsewidth = new_pulsewidth
@@ -80,12 +81,12 @@ class DigitalPipette():
         :type s: int
         """
         assert self.syringe_loaded, 'Syringe must be loaded '
-        assert self.remaining_volume + volume < self.capacity, f'Pipette {self.name} has {self.capacity - self.remaining_volume} uL of available capacity by aspirate requested {volume} uL'
+        assert self.remaining_volume + volume <= self.capacity, f'Pipette {self.name} has {self.capacity - self.remaining_volume} uL of available capacity by aspirate requested {volume} uL'
 
         new_pulsewidth = self.get_pulsewidth(volume, mode = 'aspirate')
 
-
-        self.set_pulsewidth_speed(volume, s = s)
+        logging.debug(f'New pulsewidth for aspirate: {new_pulsewidth}')
+        self.set_pulsewidth_speed(new_pulsewidth, s = s)
 
         self.current_pulsewidth = new_pulsewidth
         self.remaining_volume = self.remaining_volume + volume
@@ -106,6 +107,7 @@ class DigitalPipette():
         return new_pulsewidth
     
     def set_pulsewidth(self, pulsewidth):
+        logging.debug(f'Setting pulsewidth of {self.name} to {pulsewidth}')
         self.pi.set_servo_pulsewidth(self.gpio_pin, pulsewidth)
         self.current_pulsewidth = pulsewidth
         return
