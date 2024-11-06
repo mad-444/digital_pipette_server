@@ -16,10 +16,11 @@ You will need:
 - A raspberry pi (assuming a model 4B here, anything should work in theory) running raspberry pi OS. 
 - A digital_syringe tool, built and wired according to documentation. 
 
-### Installation
-1. Install pigpio following [their instructions](https://abyz.me.uk/rpi/pigpio/download.html)
-2. Clone this repository
-3. Install the dependencies in `requirements.txt`
+### 
+1. Set up and activate a new [python venv](https://docs.python.org/3/library/venv.html) for this project.
+2. Install pigpio following [their instructions](https://abyz.me.uk/rpi/pigpio/download.html)
+3. Clone this repository
+4. Install the dependencies in `requirements.txt`
 
 ### Configuration
 
@@ -59,7 +60,7 @@ After you start the service, you will need to "load" your syringes before they c
 
 How do you know the current pulsewidth? You probably need to set it first. Do that with the `/set_pulsewidth` route. POST a request here with json payload {"name":$<syringe_name>, "pulsewidth":$<desired pulswidth>", "speed":$<speed to move in uL/s>}.
 
-[!CAUTION]
+[!WARNING]
 If you don't set the pulsewidth to the correct current pulsewidth when calling the `/load_syringe` route, your first dispense volume will be inaccurate as the movement is calculated off of the current position. Weird things (ex aspirating when you mean to dispense) can also occur when pulsewidth is set incorrectly due to the intermediate movements set by the speed control. 
 
 ### Using the syringe
