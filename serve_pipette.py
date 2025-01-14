@@ -21,8 +21,12 @@ pipette_1cc_2 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digit
 logger.info('Instantiated pipette 1cc_2')
 pipette_1cc_3 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_3_config.json')
 logger.info('Instantiated pipette 1cc_3')
+pipette_1cc_3_hamilton = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_3_hamilton_config.json')
+logger.info('Instantiated pipette 1cc_3_hamilton')
 
-pipettes = {'10cc_1':pipette_10cc_1, '1cc_1':pipette_1cc_1, '1cc_2':pipette_1cc_2, '1cc_3':pipette_1cc_3}
+
+#assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
+pipettes = {'10cc_1':pipette_10cc_1, '1cc_1':pipette_1cc_1, '1cc_2':pipette_1cc_2, '1cc_3':pipette_1cc_3, '1cc_3_hamilton':pipette_1cc_3_hamilton}
 
 
 @app.route('/get_config', methods = ['POST'])
