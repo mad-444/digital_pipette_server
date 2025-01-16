@@ -21,8 +21,13 @@ pipette_1cc_2 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digit
 logger.info('Instantiated pipette 1cc_2')
 pipette_1cc_3 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_3_config.json')
 logger.info('Instantiated pipette 1cc_3')
+pipette_1cc_3_hamilton = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_3_hamilton_config.json')
+logger.info('Instantiated pipette 1cc_3_hamilton')
+pipette_10cc_1_glass = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/10_cc_1_glass_config.json')
+logger.info('Instantiated pipette 10cc_1_glass')
 
-pipettes = {'10cc_1':pipette_10cc_1, '1cc_1':pipette_1cc_1, '1cc_2':pipette_1cc_2, '1cc_3':pipette_1cc_3}
+#assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
+pipettes = {'10cc_1':pipette_10cc_1, '1cc_1':pipette_1cc_1, '1cc_2':pipette_1cc_2, '1cc_3':pipette_1cc_3, '1cc_3_hamilton':pipette_1cc_3_hamilton, '10cc_1_glass':pipette_10cc_1_glass}
 
 
 @app.route('/get_config', methods = ['POST'])
@@ -116,7 +121,8 @@ def set_pulsewidth():
     name = data['name']
     pipette = pipettes[name]
     s = data['speed']
-
+    logging.debug(f'pulsewidth: {pulsewidth}')
+    logging.debug(f'full position: {pipette.full_position}')
     assert ((pulsewidth < pipette.empty_position) and (pulsewidth > pipette.full_position)), 'Pulsewidth must be between 1000 and 2000'
 
     pipette.set_pulsewidth_speed(pulsewidth, s)
