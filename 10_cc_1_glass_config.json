@@ -1,0 +1,10 @@
+{
+  "us_per_uL": 0.0613,
+  "gpio_pin": 23,
+  "name": "10cc_1_glass",
+  "full_position": 1110,
+  "empty_position": 1720,
+  "capacity": 10000,
+  "time_step_size":0.1,
+  "min_pw_step":3
+}
