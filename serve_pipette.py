@@ -14,10 +14,10 @@ import digital_pipette
 logger.info('Initializing digital pipette flask app')
 
 #########
-# 1. define your syringe tools here ###
+# 1. define your syringe tools here. Make sure to update the filepath! ###
 #########
 
-example_pipette = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/example_config.json')
+example_pipette = digital_pipette.DigitalPipette.from_config('~/digital_pipette_server/example_config.json')
 logger.info('Instantiated example pipette1')
 
 #########
