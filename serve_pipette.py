@@ -13,21 +13,21 @@ import digital_pipette
 
 logger.info('Initializing digital pipette flask app')
 
-pipette_10cc_1 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/10_cc_1_config.json')
-logger.info('Instantiated pipette_10cc_1')
-pipette_1cc_1 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_1_config.json')
-logger.info('Instantiated pipette 1cc_1')
-pipette_1cc_2 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_2_config.json')
-logger.info('Instantiated pipette 1cc_2')
-pipette_1cc_3 = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_3_config.json')
-logger.info('Instantiated pipette 1cc_3')
-pipette_1cc_3_hamilton = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/1_cc_3_hamilton_config.json')
-logger.info('Instantiated pipette 1cc_3_hamilton')
-pipette_10cc_1_glass = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/10_cc_1_glass_config.json')
-logger.info('Instantiated pipette 10cc_1_glass')
+#########
+# 1. define your syringe tools here ###
+#########
 
-#assert (0 <= wiper_val) and wiper_val <= 128, 'Wiper val must be integer between 0 and 127'
-pipettes = {'10cc_1':pipette_10cc_1, '1cc_1':pipette_1cc_1, '1cc_2':pipette_1cc_2, '1cc_3':pipette_1cc_3, '1cc_3_hamilton':pipette_1cc_3_hamilton, '10cc_1_glass':pipette_10cc_1_glass}
+example_pipette = digital_pipette.DigitalPipette.from_config('/home/bgpelkie/digital_pipette_server/example_config.json')
+logger.info('Instantiated example pipette1')
+
+#########
+# 2. Add your syringe object to this dictionary, using its name as the key
+#########
+pipettes = {'example_pipette':example_pipette}
+
+###################################################
+# You should not need to change anything below here
+###################################################
 
 
 @app.route('/get_config', methods = ['POST'])
