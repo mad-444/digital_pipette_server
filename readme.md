@@ -23,9 +23,9 @@ You will need:
 4. Install the `digital_pipette_server` dependencies in `requirements.txt` by running `pip install -r requirements.txt` from the root of the digital_pipette_server repo.
 
 ### Configuration
-For now, you will set some initial configuration constants to get the tool to a usable state. These constants are not correct and you need to be careful to not overextend the servo motor to avoid damaging the motor or your syringe. 
+For now, you will set some initial configuration constants to get the tool to a usable state. These constants are not correct and you need to be careful to not overextend the servo motor to avoid damaging the motor or your syringe. Setting them up first allows you to move the syringe and determine correct values. 
 
-1. You will need to set up a config.json file for each syringe tool you have. There are examples in the `configs` directory. You will need to set:
+1. You will need to set up a config.json file for each syringe tool you have. The `example_config.json` file is a template.  You will need to set:
 - us_per_uL: conversion factor, the change in pulsewidth (in microseconds) to dispense 1 microliter. Obtain this with a gravimetric calibration or linear interpolation from full and empty positions (see below). For now, set this to `0.1`
 - gpio_pin: The pi GPIO pin that the signal wire of the servo is plugged into. 
 - name: name of the syringe tool, used to id the syringe in API requests.
@@ -35,12 +35,13 @@ For now, you will set some initial configuration constants to get the tool to a 
 - time_step_size: Resolution of movement steps for speed controlled movements. Suggested default of 0.1
 - min_pw_step: Minimum pulsewidth step to make when performing speed controlled move. Suggested minimum of 3, too small and the servo will stall
 
-2. Edit the `serve_piptte.py` file to instantiate a DigitalPipette instance for your new pipette and add it to the `pipettes` dictionary:
+2. Edit the `serve_piptte.py` file to instantiate a DigitalPipette instance for your new pipette and add it to the `pipettes` dictionary. You will need to do this for each pipette tool you are defining.
+   
 ```
-pipette_10cc_1 = digital_pipette.DigitalPipette.from_config('~/digital_pipette_server/10_cc_1_config.json')
+example_pipette = digital_pipette.DigitalPipette.from_config('~/digital_pipette_server/example_config.json')
 logger.info('Instantiated pipette_10cc_1')
 
-pipettes = {'10cc_1':pipette_10cc_1}
+pipettes = {'example_pipette':example_pipette, ... }
 ```
 
 
