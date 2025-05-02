@@ -14,13 +14,13 @@ Servo motors use a closed loop feedback system to control positioning. Position 
 
 You will need:
 - A raspberry pi (assuming a model 4B here, anything should work in theory) running raspberry pi OS and set up with a known static ip address. 
-- A digital_syringe tool, built and wired according to documentation. 
+- A digital_syringe tool, built and wired according to the [science-jubilee documentation](https://science-jubilee.readthedocs.io/en/latest/building/http_syringe.html#). 
 
 ### Installation
 1. Set up and activate a new [python venv](https://docs.python.org/3/library/venv.html) for this project.
 2. Install pigpio following [their instructions](https://abyz.me.uk/rpi/pigpio/download.html)
 3. Clone this repository
-4. Install the dependencies in `requirements.txt`
+4. Install the `digital_pipette_server` dependencies in `requirements.txt` by running `pip install -r requirements.txt.` from the root of the digital_pipette_server repo.
 
 ### Configuration
 
