@@ -18,7 +18,7 @@ You will need:
 
 ### Installation
 1. Set up and activate a new [python venv](https://docs.python.org/3/library/venv.html) for this project.
-2. Install pigpio following [their instructions](https://abyz.me.uk/rpi/pigpio/download.html)
+2. Install pigpio following [their instructions](https://abyz.me.uk/rpi/pigpio/download.html). Install this in a separate directory from the `digital_pipette_server` repo. 
 3. Clone this repository
 4. Install the `digital_pipette_server` dependencies in `requirements.txt` by running `pip install -r requirements.txt.` from the root of the digital_pipette_server repo.
 
