@@ -16,7 +16,7 @@ You will need:
 - A raspberry pi (assuming a model 4B here, anything should work in theory) running raspberry pi OS. 
 - A digital_syringe tool, built and wired according to documentation. 
 
-### 
+### Installation
 1. Set up and activate a new [python venv](https://docs.python.org/3/library/venv.html) for this project.
 2. Install pigpio following [their instructions](https://abyz.me.uk/rpi/pigpio/download.html)
 3. Clone this repository
