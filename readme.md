@@ -23,13 +23,14 @@ You will need:
 4. Install the `digital_pipette_server` dependencies in `requirements.txt` by running `pip install -r requirements.txt` from the root of the digital_pipette_server repo.
 
 ### Configuration
+For now, you will set some initial configuration constants to get the tool to a usable state. These constants are not correct and you need to be careful to not overextend the servo motor to avoid damaging the motor or your syringe. 
 
 1. You will need to set up a config.json file for each syringe tool you have. There are examples in the `configs` directory. You will need to set:
-- us_per_uL: conversion factor, the change in pulsewidth (in microseconds) to dispense 1 microliter. Obtain this with a gravimetric calibration or linear interpolation from full and empty positions (see below)
-- gpio_ping: The pi GPIO pin that the signal wire of the servo is plugged into
-- name: name of the syringe tool, used to id the syringe in API requests
-- full_position: The pulsewidth of the servo when the syringe is full. Obtain through trial and error
-- empty_position: The pulsewidth of the servo when the syringe is empty. obtain through trial and error. Set it so the syringe plunger bottoms out on the bottom of the barrel, but isn't squished too much.
+- us_per_uL: conversion factor, the change in pulsewidth (in microseconds) to dispense 1 microliter. Obtain this with a gravimetric calibration or linear interpolation from full and empty positions (see below). For now, set this to `0.1`
+- gpio_pin: The pi GPIO pin that the signal wire of the servo is plugged into. 
+- name: name of the syringe tool, used to id the syringe in API requests.
+- full_position: The pulsewidth of the servo when the syringe is full. Obtain through trial and error. Set to `1000` for now. 
+- empty_position: The pulsewidth of the servo when the syringe is empty. Obtain through trial and error. Set to `2000` for now. Once you calibrate the tool,  set this constant so the syringe plunger bottoms out on the bottom of the barrel, but isn't squished too much.
 - capacity: total capacity of the syringe between empty_position and full_position in microliters
 - time_step_size: Resolution of movement steps for speed controlled movements. Suggested default of 0.1
 - min_pw_step: Minimum pulsewidth step to make when performing speed controlled move. Suggested minimum of 3, too small and the servo will stall
