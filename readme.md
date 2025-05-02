@@ -92,8 +92,10 @@ WantedBy=basic.target
 
 Reboot. The app should now come online automatically at boot. 
 
-###
+---
 This completes the software installation of the digital_pipette server. If you are installing this tool on a science-jubilee, return to the science-jubilee HTTPsyringe tool documentation to complete setup. 
+---
+Standalone usage without science-jubilee:
 
 ### Loading a syringe
 After you start the service, you will need to "load" your syringes before they can be used. This is needed to tell the DigitalPipette python object where it's plunger/actuator system is. It is set up this way instead of doing a homing procedure so that you can load a syringe manually before installing it into the syringe tool. You load a syringe in software by calling the `/load_syringe` route with the current volume and pulsewidth of the syringe. Send a POST request to `/load_syringe` with the json payload {"name":$<syringe_name>, "volume":$<current syringe volume>, "pulsewidth":$<current syringe pulsewidth>"}. Anywhere there is a $<notes>, replace it (including $<>) with your values. The POST request is made through curl. The example command for loading syringe looks like this:
