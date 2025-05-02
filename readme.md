@@ -13,7 +13,7 @@ Servo motors use a closed loop feedback system to control positioning. Position 
 ### Requirements
 
 You will need:
-- A raspberry pi (assuming a model 4B here, anything should work in theory) running raspberry pi OS. 
+- A raspberry pi (assuming a model 4B here, anything should work in theory) running raspberry pi OS and set up with a known static ip address. 
 - A digital_syringe tool, built and wired according to documentation. 
 
 ### Installation
