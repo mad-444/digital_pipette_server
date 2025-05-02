@@ -59,23 +59,6 @@ Note: if flask command does not let curl commands received, try running the app 
 ```
 python serve_pipette.py
 ```
-
-### Loading a syringe
-After you start the service, you will need to "load" your syringes before they can be used. This is needed to tell the DigitalPipette python object where it's plunger/actuator system is. It is set up this way instead of doing a homing procedure so that you can load a syringe manually before installing it into the syringe tool. You load a syringe in software by calling the `/load_syringe` route with the current volume and pulsewidth of the syringe. Send a POST request to `/load_syringe` with the json payload {"name":$<syringe_name>, "volume":$<current syringe volume>, "pulsewidth":$<current syringe pulsewidth>"}. Anywhere there is a $<notes>, replace it (including $<>) with your values. The POST request is made through curl. The example command for loading syringe looks like this:
-
-```
-curl -d '{"name":$<syringe_name>, "volume":$<current syringe volume>, "pulsewidth":$<current syringe pulsewidth>"}' -X POST http://RaspberryUserName@192.168.0.0:5000/load_syringe -H "Content-Type: application/json"
-```
-
-How do you know the current pulsewidth? You probably need to set it first. Do that with the `/set_pulsewidth` route. POST a request here with json payload {"name":$<syringe_name>, "pulsewidth":$<desired pulswidth>", "speed":$<speed to move in uL/s>}.
-
-[!WARNING]
-If you don't set the pulsewidth to the correct current pulsewidth when calling the `/load_syringe` route, your first dispense volume will be inaccurate as the movement is calculated off of the current position. Weird things (ex aspirating when you mean to dispense) can also occur when pulsewidth is set incorrectly due to the intermediate movements set by the speed control. 
-
-### Using the syringe
-Once the syringe is loaded, it can be used to aspirate and dispense liquids. Aspirate (suck up liquid) with the `/aspirate` endpoint and dispense (push out liquid) with the `/dispense` endpoint. For both, POST a json payload containing {"name":$<syringe name>, "volume":$<volume in uL to aspirate/dispense>, "speed":$<speed to move in uL/S>}. All positioning of the syringe is handled separately, for example by using the science-jubilee HTTPsyringe tool versions of the aspirate and dispense methods. 
-
-
 ### Setting the pi up for headless use
 
 It is ideal to set up pgpiod and the flask app as system services so they start on startup. Registering them as system services will enable this.
@@ -108,5 +91,26 @@ WantedBy=basic.target
 4. Enable the service with `sudo systemctl enable pipette-service`
 
 Reboot. The app should now come online automatically at boot. 
+
+###
+This completes the software installation of the digital_pipette server. If you are installing this tool on a science-jubilee, return to the science-jubilee HTTPsyringe tool documentation to complete setup. 
+
+### Loading a syringe
+After you start the service, you will need to "load" your syringes before they can be used. This is needed to tell the DigitalPipette python object where it's plunger/actuator system is. It is set up this way instead of doing a homing procedure so that you can load a syringe manually before installing it into the syringe tool. You load a syringe in software by calling the `/load_syringe` route with the current volume and pulsewidth of the syringe. Send a POST request to `/load_syringe` with the json payload {"name":$<syringe_name>, "volume":$<current syringe volume>, "pulsewidth":$<current syringe pulsewidth>"}. Anywhere there is a $<notes>, replace it (including $<>) with your values. The POST request is made through curl. The example command for loading syringe looks like this:
+
+```
+curl -d '{"name":$<syringe_name>, "volume":$<current syringe volume>, "pulsewidth":$<current syringe pulsewidth>"}' -X POST http://RaspberryUserName@192.168.0.0:5000/load_syringe -H "Content-Type: application/json"
+```
+
+How do you know the current pulsewidth? You probably need to set it first. Do that with the `/set_pulsewidth` route. POST a request here with json payload {"name":$<syringe_name>, "pulsewidth":$<desired pulswidth>", "speed":$<speed to move in uL/s>}.
+
+[!WARNING]
+If you don't set the pulsewidth to the correct current pulsewidth when calling the `/load_syringe` route, your first dispense volume will be inaccurate as the movement is calculated off of the current position. Weird things (ex aspirating when you mean to dispense) can also occur when pulsewidth is set incorrectly due to the intermediate movements set by the speed control. 
+
+### Using the syringe
+Once the syringe is loaded, it can be used to aspirate and dispense liquids. Aspirate (suck up liquid) with the `/aspirate` endpoint and dispense (push out liquid) with the `/dispense` endpoint. For both, POST a json payload containing {"name":$<syringe name>, "volume":$<volume in uL to aspirate/dispense>, "speed":$<speed to move in uL/S>}. All positioning of the syringe is handled separately, for example by using the science-jubilee HTTPsyringe tool versions of the aspirate and dispense methods. 
+
+
+
 
 
